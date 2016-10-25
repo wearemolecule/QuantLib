@@ -23,5 +23,6 @@ add_subdirectory(ql)
 option(USE_BOOST_DYNAMIC_LIBRARIES
        "Use the shared version of Boost.Test" OFF)
 if (BUILD_TESTS)
+    enable_testing()
     add_subdirectory(test-suite)
 endif ()
