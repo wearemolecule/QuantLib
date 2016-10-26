@@ -1,0 +1,55 @@
+image: registry.molecule.io/krzysztof.wos/runners:ubuntu-xenial-cpp
+
+stages:
+    - build
+    - test
+    - package
+    - upload
+
+cache:
+    paths:
+        - external_projects
+
+GCC 6 Release Build:
+    stage: build
+    script:
+        - mkdir build
+        - cd build
+        - CC=gcc-6 CXX=g++-6 cmake -DUSE_BOOST_DYNAMIC_LIBRARIES=1 ..
+        - make CC=gcc-6 CXX=g++-6 BUILD_TYPE=Release
+    artifacts:
+        expire_in: 1 day
+        paths:
+            - build
+
+GCC 6 Release Test:
+    dependencies:
+        - GCC 6 Release Build
+    stage: test
+    script:
+        - cd build
+        - make CC=gcc-6 CXX=g++-6 BUILD_TYPE=Release test
+    artifacts:
+        expire_in: 1 day
+        paths:
+            - build
+
+GCC 6 Release Package:
+    dependencies:
+        - GCC 6 Release Test
+    stage: package
+    script:
+        - cd build
+        - make CC=gcc-6 CXX=g++-6 BUILD_TYPE=Release package
+    artifacts:
+        expire_in: 1 day
+        paths:
+            - build/*.deb
+
+GCC 6 Release Upload to S3:
+    dependencies:
+        - GCC 6 Release Package
+    stage: upload
+    script:
+        - cd build
+        - deb-s3 upload "$(ls QuantLib*.deb)" --bucket molecule-apt --prefix ubuntu --preserve-versions --visibility public
