@@ -1,5 +1,6 @@
 file(GLOB_RECURSE QUANTLIB_FILES "*.hpp" "*.cpp")
 add_library(QuantLibObjects OBJECT ${QUANTLIB_FILES})
+set_property(TARGET QuantLibObjects PROPERTY POSITION_INDEPENDENT_CODE ON)
 add_library(QuantLibStatic STATIC $<TARGET_OBJECTS:QuantLibObjects>)
 set_target_properties(QuantLibStatic PROPERTIES OUTPUT_NAME QuantLib)
 install(TARGETS QuantLibStatic ARCHIVE DESTINATION lib)
